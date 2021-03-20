@@ -1,12 +1,9 @@
-import { Link } from "../router";
 import Layout from "./Layout";
+import { Text } from "../components";
 
 const Settings = () => (
   <Layout>
-    <header className="App-header">
-      <Link to="/">Home</Link>
-    </header>
-    <p>Settings</p>
+    <Text>Define your settings here</Text>
   </Layout>
 );
 

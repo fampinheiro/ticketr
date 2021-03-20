@@ -2,10 +2,8 @@ import { ComponentProps } from "react";
 import { useParams } from "react-router-dom";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-import Track from "../components/Track";
-import Layout from "./Layout";
-
-import { singleScoreValue, settings, totalScoreValue } from "../state/atoms";
+import Track from "../../components/Track";
+import { singleScoreValue, settings } from "../../state/atoms";
 
 type Props = Pick<ComponentProps<typeof Track>, "color" | "size">;
 const Score: React.FC<Props> = (props) => {
@@ -15,7 +13,7 @@ const Score: React.FC<Props> = (props) => {
   );
 
   const handleClick = () => setQuantity(quantity + 1);
-  const handleLongPress = () => setQuantity(quantity - 1);
+  const handleLongPress = () => setQuantity(Math.max(quantity - 1, 0));
 
   return (
     <Track
@@ -27,28 +25,28 @@ const Score: React.FC<Props> = (props) => {
   );
 };
 
-const Scorecard = () => {
+const Single = () => {
   const { color } = useParams<{
     color: ComponentProps<typeof Track>["color"];
   }>();
   const values = useRecoilValue(settings.segments);
-  const totalScore = useRecoilValue(totalScoreValue(color));
 
   return (
-    <Layout>
-      <p>{color}</p>
-      <ul>
+    <>
+      <ul className="flex flex-row flex-wrap justify-center p-1">
         {values.map((props) => {
           return (
-            <li key={`t-${props}`}>
+            <li key={`t-${props}`} className="p-1">
               <Score color={color} size={props} />
             </li>
           );
         })}
       </ul>
-      <p>{totalScore}</p>
-    </Layout>
+      <p className="py-2 text-center text-gray-700">
+        Long press to remove train segments
+      </p>
+    </>
   );
 };
 
-export default Scorecard;
+export default Single;

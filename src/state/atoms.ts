@@ -1,7 +1,7 @@
-import { atom, atomFamily, selectorFamily } from "recoil";
+import { atom, atomFamily, selector, selectorFamily } from "recoil";
 
-type Track = 1 | 2 | 3 | 4 | 5 | 6 | 8;
-
+export type Track = 1 | 2 | 3 | 4 | 5 | 6 | 8;
+export type Color = "black" | "blue" | "green" | "red" | "yellow";
 const reference: Record<Track, number> = {
   1: 1,
   2: 2,
@@ -17,6 +17,10 @@ export const settings = {
     key: "settings.segments",
     default: [1, 2, 3, 4, 6, 8],
   }),
+  colors: atom<Color[]>({
+    key: "settings.colors",
+    default: ["black", "blue", "green", "red", "yellow"],
+  }),
 };
 
 type ScoreValueParams = {
@@ -29,8 +33,8 @@ export const singleScoreValue = atomFamily<number, ScoreValueParams>({
   default: 0,
 });
 
-export const totalScoreValue = selectorFamily<number, string>({
-  key: "totalScoreValue",
+export const totalSingleScoreValue = selectorFamily<number, string>({
+  key: "totalSingleScoreValue",
   get: (color) => ({ get }) => {
     const values = get(settings.segments);
     return values.reduce((sum, cur) => {
@@ -38,5 +42,18 @@ export const totalScoreValue = selectorFamily<number, string>({
         sum + reference[cur] * get(singleScoreValue({ color, lenght: cur }))
       );
     }, 0);
+  },
+});
+
+export const totalScoreValue = selector<Record<Color, number>>({
+  key: "totalScoreValue",
+  get: ({ get }) => {
+    const values = get(settings.colors);
+    return values.reduce((res, cur) => {
+      return {
+        ...res,
+        [cur]: get(totalSingleScoreValue(cur)),
+      };
+    }, {} as Record<Color, number>);
   },
 });

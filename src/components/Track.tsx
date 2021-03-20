@@ -10,11 +10,11 @@ interface Props {
 }
 
 const styles: Record<Props["color"], string> = {
-  black: "bg-black-500",
-  blue: "bg-blue-500",
-  green: "bg-green-500",
-  red: "bg-red-500",
-  yellow: "bg-yellow-500",
+  black: "bg-gray-500 hover:bg-gray-700",
+  blue: "bg-blue-500 hover:bg-blue-700",
+  green: "bg-green-500 hover:bg-green-700",
+  red: "bg-red-500 hover:bg-red-700",
+  yellow: "bg-yellow-500 hover:bg-yellow-700",
 };
 
 const Track: React.FC<Props> = ({
@@ -31,12 +31,11 @@ const Track: React.FC<Props> = ({
 
   return (
     <>
-      {quantity}
       <button
         {...touchProps}
-        className={`${styles[color]} flex flex-row px-2 py-1`}
+        className={`${styles[color]} rounded flex flex-row px-4 py-2 text-center text-gray-50 whitespace-nowrap`}
       >
-        {size} <Cog />
+        {quantity} x {size} <Cog />
       </button>
     </>
   );
