@@ -1,5 +1,6 @@
-import Truck from "../icons/Truck";
-import Cog from "../icons/Truck";
+import Icon from "./Icon";
+import { faMinus, faTrain } from "@fortawesome/free-solid-svg-icons";
+
 interface Props {
   readonly color: "black" | "blue" | "green" | "red" | "yellow";
   readonly size: number;
@@ -9,27 +10,28 @@ interface Props {
 }
 
 const styles: Record<Props["color"], string> = {
-  black: "bg-gray-500 hover:bg-gray-700",
-  blue: "bg-blue-500 hover:bg-blue-700",
-  green: "bg-green-500 hover:bg-green-700",
-  red: "bg-red-500 hover:bg-red-700",
-  yellow: "bg-yellow-500 hover:bg-yellow-700",
+  black: "bg-gray-500 group-hover:bg-gray-700",
+  blue: "bg-blue-500 group-hover:bg-blue-700",
+  green: "bg-green-500 group-hover:bg-green-700",
+  red: "bg-red-500 group-hover:bg-red-700",
+  yellow: "bg-yellow-500 group-hover:bg-yellow-700",
 };
 
 const Track: React.FC<Props> = ({ color, quantity, size, onUp, onDown }) => {
+  const disabledClass = quantity === 0 ? "text-gray-100"  : "text-gray-500";
   return (
-    <div className={`flex flex-row space-between`}>
-      <button onClick={onDown} className={`w-8`}>
-        -
+    <div className={`flex flex-row justify-center`}>
+      <button onClick={onDown} className={`${disabledClass} w-8`}>
+        <Icon icon={faMinus} />
       </button>
-      <p
-        className={`${styles[color]} rounded flex flex-row px-4 py-2 text-center text-gray-50 whitespace-nowrap`}
+      <div onClick={onUp}
+        className={`flex flex-row items-center text-center whitespace-nowrap group`}
       >
-        {quantity} x {size} <Truck />
-      </p>
-      <button onClick={onUp} className={`w-8`}>
-        +
-      </button>
+        <div className={`bg-gray-100 group-hover:bg-gray-300 rounded-l px-4 py-2 cursor-pointer shadow`}>{quantity}</div>
+        <div className={`${styles[color]} rounded-r text-center text-gray-50 whitespace-nowrap px-4 py-2 cursor-pointer	shadow`}>
+          {size} <Icon icon={faTrain} />
+        </div>
+      </div>
     </div>
   );
 };
