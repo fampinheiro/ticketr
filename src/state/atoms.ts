@@ -1,31 +1,33 @@
-import { atom, atomFamily, selector, selectorFamily } from "recoil";
-
-export type Track = 1 | 2 | 3 | 4 | 5 | 6 | 8;
-export type Color = "black" | "blue" | "green" | "red" | "yellow";
-const reference: Record<Track, number> = {
-  1: 1,
-  2: 2,
-  3: 4,
-  4: 7,
-  5: 10,
-  6: 15,
-  8: 21,
-};
-
-export const settings = {
-  segments: atom<Track[]>({
-    key: "settings.segments",
-    default: [1, 2, 3, 4, 6, 8],
-  }),
-  colors: atom<Color[]>({
-    key: "settings.colors",
-    default: ["black", "blue", "green", "red", "yellow"],
-  }),
-};
+import * as z from "zod";
+import { Color, Segment, score } from "../constants";
+import { atomFamily, selector, selectorFamily } from "recoil";
 
 type ScoreValueParams = {
   color: string;
-  lenght: number;
+  lenght: string;
+};
+
+const colors = atomFamily<boolean, z.infer<typeof Color>>({
+  key: "settings.color",
+  default: true,
+});
+
+const segments = atomFamily<boolean, z.infer<typeof Segment>>({
+  key: "settings.segments",
+  default: true,
+});
+
+export const settings = {
+  colors,
+  segments,
+  activeColors: selector({
+    key: "settings.activeColors",
+    get: ({ get }) => Color.options.filter((c) => get(colors(c))),
+  }),
+  activeSegments: selector({
+    key: "settings.activeSegments",
+    get: ({ get }) => Segment.options.filter((c) => get(segments(c))),
+  }),
 };
 
 export const singleScoreValue = atomFamily<number, ScoreValueParams>({
@@ -36,24 +38,30 @@ export const singleScoreValue = atomFamily<number, ScoreValueParams>({
 export const totalSingleScoreValue = selectorFamily<number, string>({
   key: "totalSingleScoreValue",
   get: (color) => ({ get }) => {
-    const values = get(settings.segments);
-    return values.reduce((sum, cur) => {
-      return (
-        sum + reference[cur] * get(singleScoreValue({ color, lenght: cur }))
-      );
+    return get(settings.activeSegments).reduce((sum, cur) => {
+      const value = score[cur];
+      if (!get(settings.segments(cur))) {
+        return sum;
+      }
+      return sum + value * get(singleScoreValue({ color, lenght: cur }));
     }, 0);
   },
 });
 
-export const totalScoreValue = selector<Record<Color, number>>({
+export const totalScoreValue = selector({
   key: "totalScoreValue",
   get: ({ get }) => {
-    const values = get(settings.colors);
-    return values.reduce((res, cur) => {
+    return get(settings.activeColors).reduce((res, color) => {
+      if (!get(settings.colors(color))) {
+        return res;
+      }
+
+      const value = get(totalSingleScoreValue(color));
+
       return {
         ...res,
-        [cur]: get(totalSingleScoreValue(cur)),
+        [color]: value,
       };
-    }, {} as Record<Color, number>);
+    }, {} as Record<z.infer<typeof Color>, number>);
   },
 });
