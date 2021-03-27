@@ -12,15 +12,15 @@ const Score: React.FC<Props> = (props) => {
     singleScoreValue({ color, lenght: size })
   );
 
-  const handleClick = () => setQuantity(quantity + 1);
-  const handleLongPress = () => setQuantity(Math.max(quantity - 1, 0));
+  const handleUpClick = () => setQuantity(quantity + 1);
+  const handleDownClick = () => setQuantity(Math.max(quantity - 1, 0));
 
   return (
     <Track
       {...props}
       quantity={quantity}
-      onLongPress={handleLongPress}
-      onClick={handleClick}
+      onUp={handleUpClick}
+      onDown={handleDownClick}
     />
   );
 };
@@ -33,7 +33,7 @@ const Single = () => {
 
   return (
     <>
-      <ul className="flex flex-row flex-wrap justify-center p-1">
+      <ul className="flex flex-col flex-wrap justify-center p-1">
         {values.map((props) => {
           return (
             <li key={`t-${props}`} className="p-1">
@@ -43,7 +43,7 @@ const Single = () => {
         })}
       </ul>
       <p className="py-2 text-center text-gray-700">
-        Long press to remove train segments
+        Double click to remove segments
       </p>
     </>
   );
